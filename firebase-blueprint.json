@@ -1,0 +1,182 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with balance, referrals, and VIP membership",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64, "description": "Unique user ID" },
+        "name": { "type": "string", "maxLength": 100, "description": "User full name" },
+        "phone": { "type": "string", "maxLength": 20, "description": "Mobile phone number" },
+        "pass": { "type": "string", "maxLength": 100, "description": "Password" },
+        "balance": { "type": "number", "description": "Current balance in BDT" },
+        "totalEarnings": { "type": "number", "description": "Cumulative earned amount" },
+        "totalReferrals": { "type": "number", "description": "Total referred users count" },
+        "referralCode": { "type": "string", "maxLength": 20, "description": "Unique referral code" },
+        "referredBy": { "type": "string", "maxLength": 20, "description": "Referrer code" },
+        "status": { "type": "string", "enum": ["active", "banned"], "description": "Account status" },
+        "dailySpinsRemaining": { "type": "number", "description": "Lucky wheel spins remaining today" },
+        "lastDailyBonusClaimedAt": { "type": "number", "description": "Timestamp in ms of last daily bonus claim" },
+        "isVerified": { "type": "boolean", "description": "Whether account is verified by admin" },
+        "verifiedAt": { "type": "string", "maxLength": 64, "description": "Verification date" },
+        "vipLevel": { "type": "number", "description": "VIP plan level (0-5)" },
+        "vipPurchasedAt": { "type": "string", "maxLength": 64, "description": "VIP purchase date" },
+        "lastVipIncomeClaimedAt": { "type": "number", "description": "Timestamp in ms of last daily VIP income claim" },
+        "totalVipEarnings": { "type": "number", "description": "Total earnings from VIP daily income" },
+        "createdAt": { "type": "string", "maxLength": 64, "description": "Registration ISO timestamp" }
+      },
+      "required": ["id", "name", "phone", "balance", "totalEarnings", "referralCode", "status"]
+    },
+    "AdminSettings": {
+      "title": "AdminSettings",
+      "description": "Global administration settings and payment numbers",
+      "type": "object",
+      "properties": {
+        "bkashNumber": { "type": "string", "maxLength": 20, "description": "bKash wallet number" },
+        "bkashType": { "type": "string", "maxLength": 20, "description": "bKash type (Personal/Agent)" },
+        "nagadNumber": { "type": "string", "maxLength": 20, "description": "Nagad wallet number" },
+        "nagadType": { "type": "string", "maxLength": 20, "description": "Nagad type" },
+        "rocketNumber": { "type": "string", "maxLength": 20, "description": "Rocket wallet number" },
+        "rocketType": { "type": "string", "maxLength": 20, "description": "Rocket type" },
+        "minWithdraw": { "type": "number", "description": "Minimum withdraw threshold" },
+        "requiredReferralsForWithdraw": { "type": "number", "description": "Referrals required before withdraw" },
+        "verificationDepositFee": { "type": "number", "description": "Secret verification fee" },
+        "dailyBonusAmount": { "type": "number", "description": "Daily claim bonus in BDT" },
+        "referBonus": { "type": "number", "description": "Referral commission in BDT" },
+        "dailySpinLimit": { "type": "number", "description": "Daily lucky spin limit" },
+        "adminSecretPin": { "type": "string", "maxLength": 50, "description": "Admin access secret code" },
+        "supportTelegram": { "type": "string", "maxLength": 255, "description": "Telegram support link" },
+        "supportPhone": { "type": "string", "maxLength": 20, "description": "Helpline phone number" },
+        "notice": { "type": "string", "maxLength": 1000, "description": "Marquee announcement" },
+        "videoTutorialUrl": { "type": "string", "maxLength": 255, "description": "Tutorial video URL" },
+        "apkDownloadUrl": { "type": "string", "maxLength": 255, "description": "Android APK download URL" },
+        "adsensePubId": { "type": "string", "maxLength": 100, "description": "AdSense publisher ID" },
+        "adsenseBannerSlot": { "type": "string", "maxLength": 100, "description": "Banner ad slot ID" },
+        "adsenseRewardSlot": { "type": "string", "maxLength": 100, "description": "Rewarded ad slot ID" },
+        "adsEnabled": { "type": "boolean", "description": "AdSense ad toggle" },
+        "customAdCode": { "type": "string", "maxLength": 2000, "description": "Custom JS/HTML ad code" }
+      },
+      "required": ["bkashNumber", "nagadNumber", "adminSecretPin", "minWithdraw", "dailyBonusAmount"]
+    },
+    "TaskItem": {
+      "title": "TaskItem",
+      "description": "Earning task item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64, "description": "Task identifier" },
+        "title": { "type": "string", "maxLength": 200, "description": "Task headline" },
+        "description": { "type": "string", "maxLength": 500, "description": "Task instructions" },
+        "reward": { "type": "number", "description": "Taka reward per completion" },
+        "durationSec": { "type": "number", "description": "Countdown timer in seconds" },
+        "type": { "type": "string", "enum": ["web", "youtube", "telegram", "review", "ads"], "description": "Task category" },
+        "targetUrl": { "type": "string", "maxLength": 500, "description": "Task action URL" },
+        "iconType": { "type": "string", "maxLength": 50, "description": "Icon descriptor" },
+        "completedCount": { "type": "number", "description": "Completed counter" },
+        "active": { "type": "boolean", "description": "Whether task is live" }
+      },
+      "required": ["id", "title", "reward", "durationSec", "type", "active"]
+    },
+    "TaskHistory": {
+      "title": "TaskHistory",
+      "description": "Log of completed user tasks",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64, "description": "History record ID" },
+        "userId": { "type": "string", "maxLength": 64, "description": "Completer user ID" },
+        "taskId": { "type": "string", "maxLength": 64, "description": "Completed task ID" },
+        "taskTitle": { "type": "string", "maxLength": 200, "description": "Task name" },
+        "reward": { "type": "number", "description": "Reward credited" },
+        "completedAt": { "type": "string", "maxLength": 64, "description": "Completion timestamp" }
+      },
+      "required": ["id", "userId", "taskId", "reward", "completedAt"]
+    },
+    "WithdrawRequest": {
+      "title": "WithdrawRequest",
+      "description": "User withdrawal request",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64, "description": "Withdraw ID" },
+        "userId": { "type": "string", "maxLength": 64, "description": "Requester user ID" },
+        "userName": { "type": "string", "maxLength": 100, "description": "Requester name" },
+        "method": { "type": "string", "enum": ["BKASH", "NAGAD", "ROCKET"], "description": "Selected method" },
+        "receiverNumber": { "type": "string", "maxLength": 20, "description": "Receiving mobile account" },
+        "amount": { "type": "number", "description": "Amount in BDT" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"], "description": "Request state" },
+        "requestedAt": { "type": "string", "maxLength": 64, "description": "Submission time" },
+        "processedAt": { "type": "string", "maxLength": 64, "description": "Approval/rejection time" },
+        "adminNote": { "type": "string", "maxLength": 500, "description": "Admin note" }
+      },
+      "required": ["id", "userId", "method", "receiverNumber", "amount", "status", "requestedAt"]
+    },
+    "DepositRequest": {
+      "title": "DepositRequest",
+      "description": "User deposit / verification request",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64, "description": "Deposit ID" },
+        "userId": { "type": "string", "maxLength": 64, "description": "Sender user ID" },
+        "userName": { "type": "string", "maxLength": 100, "description": "Sender user name" },
+        "method": { "type": "string", "enum": ["BKASH", "NAGAD", "ROCKET"], "description": "Payment gateway" },
+        "senderNumber": { "type": "string", "maxLength": 20, "description": "Sender mobile number" },
+        "trxId": { "type": "string", "maxLength": 50, "description": "Transaction ID TrxID" },
+        "amount": { "type": "number", "description": "Sent amount" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"], "description": "Request status" },
+        "requestedAt": { "type": "string", "maxLength": 64, "description": "Submission date" },
+        "processedAt": { "type": "string", "maxLength": 64, "description": "Action date" },
+        "adminNote": { "type": "string", "maxLength": 500, "description": "Admin remark" },
+        "isVerificationDeposit": { "type": "boolean", "description": "Whether deposit is for account verification" }
+      },
+      "required": ["id", "userId", "method", "senderNumber", "trxId", "amount", "status", "requestedAt"]
+    },
+    "VipPurchase": {
+      "title": "VipPurchase",
+      "description": "VIP plan purchase transaction",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64, "description": "Purchase record ID" },
+        "userId": { "type": "string", "maxLength": 64, "description": "Buyer user ID" },
+        "userName": { "type": "string", "maxLength": 100, "description": "Buyer user name" },
+        "vipLevel": { "type": "number", "description": "Purchased VIP level 1-5" },
+        "vipName": { "type": "string", "maxLength": 50, "description": "Plan name" },
+        "cost": { "type": "number", "description": "Cost paid in BDT" },
+        "dailyIncome": { "type": "number", "description": "Daily reward in BDT" },
+        "purchasedAt": { "type": "string", "maxLength": 64, "description": "Purchase timestamp" }
+      },
+      "required": ["id", "userId", "vipLevel", "cost", "dailyIncome", "purchasedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Registered users with real-time balance and VIP level"
+    },
+    "/settings/{settingsId}": {
+      "schema": "AdminSettings",
+      "description": "Global admin settings and contact numbers"
+    },
+    "/tasks/{taskId}": {
+      "schema": "TaskItem",
+      "description": "Available earning tasks"
+    },
+    "/task_history/{historyId}": {
+      "schema": "TaskHistory",
+      "description": "Task completion logs"
+    },
+    "/withdraw_requests/{requestId}": {
+      "schema": "WithdrawRequest",
+      "description": "Withdrawal submissions"
+    },
+    "/deposit_requests/{requestId}": {
+      "schema": "DepositRequest",
+      "description": "Deposit and account verification submissions"
+    },
+    "/vip_purchases/{purchaseId}": {
+      "schema": "VipPurchase",
+      "description": "VIP plan subscription logs"
+    },
+    "/test/{testId}": {
+      "schema": "User",
+      "description": "Connection test collection"
+    }
+  }
+}

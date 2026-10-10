@@ -1,0 +1,6 @@
+{
+  "name": "NEXORA PAY BD",
+  "description": "NEXORA PAY BD - ঘরে বসে স্মার্ট ইনকাম, টাস্ক আর্নিং, ডিপোজিট ও ইনস্ট্যান্ট উইথড্র প্ল্যাটফর্ম এবং সহজ অ্যাডমিন প্যানেল।",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,71 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default fallback deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Health check / connection test collection
+    match /test/{testId} {
+      allow read, write: if true;
+    }
+
+    // Users collection: persistent user balances, credentials, and VIP statuses
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.resource.data.id is string
+                    && request.resource.data.name is string
+                    && request.resource.data.phone is string;
+      allow update: if true;
+      allow delete: if false;
+    }
+
+    // Settings collection: global admin configurations, payment numbers, notices
+    match /settings/{settingsId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Tasks collection: available tasks for users to earn money
+    match /tasks/{taskId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Task completions history
+    match /task_history/{historyId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if false;
+    }
+
+    // Withdrawal requests
+    match /withdraw_requests/{requestId} {
+      allow read: if true;
+      allow create: if request.resource.data.userId is string
+                    && request.resource.data.amount is number;
+      allow update: if true;
+      allow delete: if false;
+    }
+
+    // Deposit and verification requests
+    match /deposit_requests/{requestId} {
+      allow read: if true;
+      allow create: if request.resource.data.userId is string
+                    && request.resource.data.amount is number
+                    && request.resource.data.trxId is string;
+      allow update: if true;
+      allow delete: if false;
+    }
+
+    // VIP level plan purchase logs
+    match /vip_purchases/{purchaseId} {
+      allow read: if true;
+      allow create: if request.resource.data.userId is string
+                    && request.resource.data.vipLevel is number;
+      allow update, delete: if false;
+    }
+  }
+}
