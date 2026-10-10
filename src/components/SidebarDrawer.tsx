@@ -15,7 +15,9 @@ import {
   ShieldAlert,
   LogOut,
   X,
-  Crown
+  Crown,
+  ShieldCheck,
+  FileText
 } from 'lucide-react';
 
 export const SidebarDrawer: React.FC = () => {
@@ -201,6 +203,31 @@ export const SidebarDrawer: React.FC = () => {
               <span className="font-bold text-emerald-900 text-sm">ডিপোজিট করুন</span>
               <span className="text-[11px] text-emerald-700">বিকাশ / নগদ / রকেট</span>
             </div>
+          </button>
+
+          {/* Privacy Policy (Google AdSense requirement) */}
+          <button
+            onClick={() => handleNav('privacy-policy')}
+            className="w-full flex items-center gap-3.5 p-3 rounded-2xl hover:bg-slate-50 transition-colors text-left"
+          >
+            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 shadow-xs shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="font-semibold text-slate-800 text-sm block">প্রাইভেসি পলিসি</span>
+              <span className="text-[10px] text-slate-400">Google Policy Compliant</span>
+            </div>
+          </button>
+
+          {/* Terms of Service */}
+          <button
+            onClick={() => handleNav('terms')}
+            className="w-full flex items-center gap-3.5 p-3 rounded-2xl hover:bg-slate-50 transition-colors text-left"
+          >
+            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 shadow-xs shrink-0">
+              <FileText className="w-5 h-5" />
+            </div>
+            <span className="font-semibold text-slate-800 text-sm">শর্তাবলী ও নীতিমালা</span>
           </button>
 
           {/* Logout */}

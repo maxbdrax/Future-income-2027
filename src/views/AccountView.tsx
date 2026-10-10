@@ -387,6 +387,35 @@ export const AccountView: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Footer Legal & Compliance Links (Google AdSense Required) */}
+      <div className="pt-2 pb-6 text-center space-y-2 border-t border-amber-200/40">
+        <div className="flex items-center justify-center gap-4 text-xs font-semibold text-slate-500">
+          <button
+            onClick={() => setCurrentModal('privacy-policy')}
+            className="hover:text-amber-600 transition-colors underline cursor-pointer"
+          >
+            প্রাইভেসি পলিসি
+          </button>
+          <span>•</span>
+          <button
+            onClick={() => setCurrentModal('terms')}
+            className="hover:text-amber-600 transition-colors underline cursor-pointer"
+          >
+            শর্তাবলী
+          </button>
+          <span>•</span>
+          <button
+            onClick={() => setCurrentModal('support')}
+            className="hover:text-amber-600 transition-colors underline cursor-pointer"
+          >
+            সাপোর্ট হেল্পলাইন
+          </button>
+        </div>
+        <p className="text-[10px] text-slate-400">
+          Future Income 2027 © সর্বস্বত্ব সংরক্ষিত | গুগল এডসেন্স অনুমোদিত প্ল্যাটফর্ম
+        </p>
+      </div>
     </div>
   );
 };

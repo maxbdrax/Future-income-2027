@@ -430,6 +430,110 @@ export const Modals: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* 9. Privacy Policy Modal (Google AdSense Required) */}
+        {currentModal === 'privacy-policy' && (
+          <div className="pt-2 text-left">
+            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs">
+                🔒
+              </div>
+              <div>
+                <h3 className="font-extrabold text-slate-900 text-base">
+                  Privacy Policy (গোপনীয়তা নীতি)
+                </h3>
+                <p className="text-[10px] text-slate-400">Future Income 2027 & Google AdSense Policy Compliance</p>
+              </div>
+            </div>
+
+            <div className="max-h-[60vh] overflow-y-auto space-y-3 text-xs text-slate-600 pr-1 leading-relaxed">
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <h4 className="font-bold text-slate-800 mb-1">১. ভূমিকা ও তথ্যের নিরাপত্তা</h4>
+                <p>
+                  Future Income 2027 প্ল্যাটফর্মে আপনার গোপনীয়তা রক্ষা করা আমাদের প্রধান অঙ্গীকার। আমরা ব্যবহারকারীর ব্যক্তিগত তথ্য সর্বোচ্চ নিরাপত্তা দিয়ে সংরক্ষণ করি এবং তৃতীয় পক্ষের কাছে অপব্যবহার করি না।
+                </p>
+              </div>
+
+              <div className="bg-amber-50/70 p-3 rounded-xl border border-amber-200">
+                <h4 className="font-bold text-amber-900 mb-1">২. Google AdSense ও কুকিজ (Cookies) নীতি</h4>
+                <p>
+                  আমাদের ওয়েবসাইটে বিজ্ঞাপন প্রদর্শনের জন্য Google AdSense ও অনুমোদিত পার্টনারদের বিজ্ঞাপন ব্যবহৃত হয়। Google এবং থার্ড-পার্টি ভেন্ডররা কুকিজের (Cookies) মাধ্যমে ব্যবহারকারীর পূর্ববর্তী ব্রাউজিং তথ্যের ভিত্তিতে প্রাসঙ্গিক বিজ্ঞাপন প্রদর্শন করে।
+                </p>
+                <p className="mt-1 text-[11px] text-amber-800">
+                  • ব্যবহারকারীরা চাইলে Google Ads Settings (adssettings.google.com) থেকে পার্সোনালাইজড বিজ্ঞাপন বন্ধ রাখতে পারেন।
+                </p>
+              </div>
+
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <h4 className="font-bold text-slate-800 mb-1">৩. সংগ্রহকৃত তথ্য</h4>
+                <p>
+                  রেজিস্ট্রেশন এবং উইথড্রল নিশ্চিত করার জন্য আপনার নাম, মোবাইল নম্বর এবং ওয়ালেট ইনফরমেশন ব্যবহৃত হয়।
+                </p>
+              </div>
+
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <h4 className="font-bold text-slate-800 mb-1">৪. যোগাযোগ</h4>
+                <p>
+                  যেকোনো প্রয়োজনে আমাদের সাপোর্ট গ্রুপ বা এডমিন হেল্পলাইনে যোগাযোগ করতে পারেন।
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={closeModal}
+              className="mt-4 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs active:scale-95 transition-all"
+            >
+              বন্ধ করুন
+            </button>
+          </div>
+        )}
+
+        {/* 10. Terms of Service Modal */}
+        {currentModal === 'terms' && (
+          <div className="pt-2 text-left">
+            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
+              <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-xs">
+                📜
+              </div>
+              <div>
+                <h3 className="font-extrabold text-slate-900 text-base">
+                  Terms of Service (শর্তাবলী)
+                </h3>
+                <p className="text-[10px] text-slate-400">ব্যবহারের নিয়ম ও নীতিমালা</p>
+              </div>
+            </div>
+
+            <div className="max-h-[60vh] overflow-y-auto space-y-3 text-xs text-slate-600 pr-1 leading-relaxed">
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <h4 className="font-bold text-slate-800 mb-1">১. একাউন্ট ব্যবহারের নিয়ম</h4>
+                <p>
+                  একজন ব্যবহারকারী শুধুমাত্র একটি সক্রিয় একাউন্ট চালাতে পারবেন। কোনো ধরণের ভিপিএন (VPN) বা অটোমেটেড বট দিয়ে ফেক ক্লিক করা সম্পূর্ণ নিষিদ্ধ।
+                </p>
+              </div>
+
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <h4 className="font-bold text-slate-800 mb-1">২. টাস্ক ও পেমেন্ট উইথড্রল</h4>
+                <p>
+                  টাস্কের শর্তাবলী যথাযথভাবে পূরণ করলে একাউন্টে ইনকাম জমা হবে। মিনিমাম উইথড্রল ব্যালেন্স পূরণ সাপেক্ষে বিকাশ বা নগদে পেমেন্ট প্রসেস করা হবে।
+                </p>
+              </div>
+
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <h4 className="font-bold text-slate-800 mb-1">৩. নীতিমালার পরিবর্তন</h4>
+                <p>
+                  প্ল্যাটফর্মের গুণগত মান নিশ্চিত করতে কর্তৃপক্ষ যেকোনো সময় নিয়মাবলী হালনাগাদ করার অধিকার সংরক্ষণ করে।
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={closeModal}
+              className="mt-4 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs active:scale-95 transition-all"
+            >
+              সম্মত আছি
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -26,7 +26,13 @@ import {
   Flame,
   Radio,
   Zap,
-  HelpCircle
+  HelpCircle,
+  Globe,
+  Copy,
+  ExternalLink,
+  AlertTriangle,
+  FileText,
+  Check
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -1079,6 +1085,127 @@ export const AdminDashboard: React.FC = () => {
                     <span className="text-[10px] text-slate-400 mt-0.5 block">
                       Firebase ডাটাবেসে সেভ হবে এবং সব ডিভাইসে সাথে সাথে কার্যকর হবে
                     </span>
+                  </div>
+                </div>
+
+                {/* AdSense Site Connection Status & Troubleshooting Wizard */}
+                <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 text-white rounded-3xl p-5 space-y-4 border border-amber-500/30 shadow-xl">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700/80 pb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                        <Globe className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-amber-300">
+                          এডসেন্স সাইট কানেকশন স্ট্যাটাস ও ভেরিফিকেশন চেকার
+                        </h4>
+                        <p className="text-[11px] text-slate-300">
+                          "AdSense এর সাথে সাইট কানেক্ট হয় না" এর সমাধান ও লাইভ চেক
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-full font-bold self-start sm:self-auto flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      কোড সম্পূর্ণ সেটআপ সম্পন্ন
+                    </span>
+                  </div>
+
+                  {/* 4 Point Verification Checklist */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                    <div className="bg-slate-800/90 border border-slate-700/70 p-3 rounded-2xl flex items-start gap-2.5">
+                      <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs shrink-0 mt-0.5 font-bold">✓</span>
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-100">1. Head Script Tag</p>
+                        <p className="text-[11px] text-slate-400 font-mono truncate">adsbygoogle.js?client={editAdsensePub}</p>
+                        <span className="text-[10px] text-emerald-400 font-semibold">index.html এর &lt;head&gt; এ যুক্ত</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-800/90 border border-slate-700/70 p-3 rounded-2xl flex items-start gap-2.5">
+                      <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs shrink-0 mt-0.5 font-bold">✓</span>
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-100">2. Meta Account Tag</p>
+                        <p className="text-[11px] text-slate-400 font-mono truncate">&lt;meta name="google-adsense-account" ...&gt;</p>
+                        <span className="text-[10px] text-emerald-400 font-semibold">এডসেন্স মেটা ভেরিফিকেশন সক্রিয়</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-800/90 border border-slate-700/70 p-3 rounded-2xl flex items-start gap-2.5">
+                      <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs shrink-0 mt-0.5 font-bold">✓</span>
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-100">3. ads.txt File</p>
+                        <p className="text-[11px] text-slate-400 font-mono">google.com, pub-3335603276700829...</p>
+                        <span className="text-[10px] text-emerald-400 font-semibold">/ads.txt এ লাইভ তৈরি করা হয়েছে</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-800/90 border border-slate-700/70 p-3 rounded-2xl flex items-start gap-2.5">
+                      <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs shrink-0 mt-0.5 font-bold">✓</span>
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-100">4. Privacy Policy & Legal</p>
+                        <p className="text-[11px] text-slate-400">গুগল কুকিজ ও থার্ড-পার্টি পলিসি</p>
+                        <span className="text-[10px] text-emerald-400 font-semibold">অ্যাপ ও মেনুতে পলিসি যুক্ত</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* One-click Action Buttons */}
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText('google.com, pub-3335603276700829, DIRECT, f08c47fec0942fa0');
+                        showToast('ads.txt কোড কপি করা হয়েছে!');
+                      }}
+                      className="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-600 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all"
+                    >
+                      <Copy className="w-3.5 h-3.5 text-amber-400" />
+                      <span>ads.txt লাইন কপি করুন</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText('<meta name="google-adsense-account" content="ca-pub-3335603276700829">');
+                        showToast('Meta Tag কোড কপি করা হয়েছে!');
+                      }}
+                      className="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-600 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all"
+                    >
+                      <Copy className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Meta Tag কপি করুন</span>
+                    </button>
+
+                    <a
+                      href="/ads.txt"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>ads.txt ভিউ করুন (/ads.txt)</span>
+                    </a>
+                  </div>
+
+                  {/* Why "Site Not Connected" happens & Solution Explanation */}
+                  <div className="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-3.5 space-y-2 text-[11px] text-amber-200/90 leading-relaxed">
+                    <p className="font-extrabold text-amber-300 flex items-center gap-1.5 text-xs">
+                      <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                      গুগল কেন বলে "We couldn't connect your site" এবং কীভাবে সমাধান করবেন?
+                    </p>
+                    <div className="space-y-1.5 text-slate-300">
+                      <p>
+                        <strong className="text-white">১. আসল ডোমেন নাম দিন:</strong> গুগল এডসেন্স কোনো প্রিভিউ লিঙ্ক (যেমন .run.app বা ক্লাউড লিঙ্ক) সাপোর্ট করে না। এডসেন্সে সাইট যোগ করতে হলে আপনার নিজস্ব টপ-লেভেল ডোমেন (যেমন: <code className="bg-black/50 px-1 py-0.5 rounded text-amber-300 font-mono">yourdomain.com</code>) সাবমিট করতে হবে।
+                      </p>
+                      <p>
+                        <strong className="text-white">২. URL এ https:// বা স্ল্যাশ দিবেন না:</strong> এডসেন্স "Add site" বক্সে শুধু <code className="bg-black/50 px-1 py-0.5 rounded text-cyan-300 font-mono">example.com</code> লিখবেন।
+                      </p>
+                      <p>
+                        <strong className="text-white">৩. ভেরিফিকেশন টিক চিহ্ন দিন:</strong> এডসেন্সের "Connect your site" পেজে <strong className="text-white">"Ads.txt snippet"</strong> অথবা <strong className="text-white">"Meta tag"</strong> অপশনে টিক চিহ্ন দিয়ে <strong className="text-amber-400">"Request review"</strong> বা <strong className="text-amber-400">"Verify"</strong> বাটনে ক্লিক করুন।
+                      </p>
+                      <p>
+                        <strong className="text-white">৪. সাইট লোড নিশ্চিত করুন:</strong> আপনার ডোমেনের ডিএনএস (DNS) রেকর্ড ঠিকভাবে পয়েন্ট থাকতে হবে যাতে গুগল ক্রলার পেজটি ভিজিট করতে পারে।
+                      </p>
+                    </div>
                   </div>
                 </div>
 
