@@ -82,7 +82,7 @@ const DEFAULT_TASKS: TaskItem[] = [
     reward: 15.00,
     durationSec: 60,
     type: 'youtube',
-    targetUrl: 'https://youtube.com',
+    targetUrl: 'https://www.youtube.com/watch?v=fJ9rUzIMcZQ',
     iconType: 'youtube',
     completedCount: 0,
     active: true
@@ -142,7 +142,7 @@ const DEFAULT_TASKS: TaskItem[] = [
     reward: 5.00,
     durationSec: 15,
     type: 'ads',
-    targetUrl: '#',
+    targetUrl: 'https://www.youtube.com/watch?v=kJQP7kiw5Fk',
     iconType: 'play',
     completedCount: 0,
     active: true
@@ -166,7 +166,7 @@ const DEFAULT_SETTINGS: AdminSettings = {
   supportTelegram: 'https://t.me/nexorapaybd',
   supportPhone: '01855667788',
   notice: 'সম্মানিত মেম্বারবৃন্দ, Future Income 2027-এ প্রতিদিনের টাস্ক ও VIP লেভেলে আনলিমিটেড টাকা আয় করুন! উইথড্র রিকোয়েস্ট পাঠানোর সর্বোচ্চ ১৫-৩০ মিনিটের মধ্যে বিকাশ ও নগদে পেমেন্ট প্রদান করা হয়।',
-  videoTutorialUrl: 'https://youtube.com',
+  videoTutorialUrl: 'https://www.youtube.com/watch?v=fJ9rUzIMcZQ',
   apkDownloadUrl: '#',
   // Google AdSense & Ad Networks
   adsensePubId: 'ca-pub-3335603276700829',

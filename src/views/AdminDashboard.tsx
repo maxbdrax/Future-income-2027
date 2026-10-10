@@ -32,7 +32,11 @@ import {
   ExternalLink,
   AlertTriangle,
   FileText,
-  Check
+  Check,
+  Edit3,
+  PlayCircle,
+  Video,
+  Link
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -48,6 +52,7 @@ export const AdminDashboard: React.FC = () => {
     approveDeposit,
     rejectDeposit,
     addTask,
+    updateTask,
     deleteTask,
     updateSettings,
     adjustUserBalance,
@@ -74,11 +79,15 @@ export const AdminDashboard: React.FC = () => {
     if (settings.adsenseRewardSlot) setEditAdsenseRewardSlot(settings.adsenseRewardSlot);
     if (settings.adsEnabled !== undefined) setEditAdsEnabled(settings.adsEnabled);
     if (settings.customAdCode !== undefined) setEditCustomAdCode(settings.customAdCode);
+    if (settings.videoTutorialUrl) setEditVideoTutorialUrl(settings.videoTutorialUrl);
   }, [settings]);
 
   // VIP assignment manual modal/state
   const [selectedUserForVip, setSelectedUserForVip] = useState<string | null>(null);
   const [selectedVipLevelToSet, setSelectedVipLevelToSet] = useState<number>(1);
+
+  // Task editing state
+  const [editingTask, setEditingTask] = useState<TaskItem | null>(null);
 
   // New task form state
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -103,6 +112,7 @@ export const AdminDashboard: React.FC = () => {
   const [editAdminPin, setEditAdminPin] = useState(settings.adminSecretPin || 'admin7788');
   const [editNotice, setEditNotice] = useState(settings.notice);
   const [editTelegram, setEditTelegram] = useState(settings.supportTelegram);
+  const [editVideoTutorialUrl, setEditVideoTutorialUrl] = useState(settings.videoTutorialUrl || 'https://www.youtube.com/watch?v=fJ9rUzIMcZQ');
 
   // User search & balance modal
   const [userSearch, setUserSearch] = useState('');
@@ -176,7 +186,8 @@ export const AdminDashboard: React.FC = () => {
       verificationDepositFee: parseFloat(editVerificationFee) || 300,
       adminSecretPin: editAdminPin.trim() || 'admin7788',
       notice: editNotice,
-      supportTelegram: editTelegram
+      supportTelegram: editTelegram,
+      videoTutorialUrl: editVideoTutorialUrl.trim()
     });
   };
 
@@ -679,14 +690,33 @@ export const AdminDashboard: React.FC = () => {
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block font-bold text-slate-700 mb-1">টার্গেট লিংক (URL)</label>
-                    <input
-                      type="text"
-                      value={newTaskUrl}
-                      onChange={(e) => setNewTaskUrl(e.target.value)}
-                      placeholder="https://..."
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono"
-                    />
+                    <label className="block font-bold text-slate-700 mb-1">
+                      টার্গেট লিংক (URL বা YouTube ভিডিও লিংক)
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newTaskUrl}
+                        onChange={(e) => setNewTaskUrl(e.target.value)}
+                        placeholder="যেমন: https://www.youtube.com/watch?v=... বা https://t.me/..."
+                        className="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono text-xs"
+                      />
+                      {newTaskUrl && newTaskUrl.startsWith('http') && (
+                        <a
+                          href={newTaskUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl flex items-center gap-1 font-bold shrink-0 text-xs transition-colors"
+                          title="লিংক টেস্ট করুন"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>টেস্ট</span>
+                        </a>
+                      )}
+                    </div>
+                    <span className="text-[10px] text-amber-700 mt-1 block">
+                      💡 ইউটিউব ভিডিও লিংক দিলে ইউজারের ফোনে পপ-আপ আকারে ভিডিওটি সরাসরি অটো-প্লে হবে এবং সময় শেষে টাকা যোগ হবে।
+                    </span>
                   </div>
 
                   <div className="md:col-span-2">
@@ -707,35 +737,191 @@ export const AdminDashboard: React.FC = () => {
                   বর্তমান টাস্ক তালিকা ({tasks.length})
                 </h3>
 
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {tasks.map((task) => (
                     <div
                       key={task.id}
-                      className="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between gap-3 text-xs"
+                      className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
                     >
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-bold text-slate-900">{task.title}</span>
                           <span className="text-emerald-700 font-extrabold bg-emerald-100 px-2 py-0.5 rounded-full text-[10px]">
                             ৳ {task.reward.toFixed(2)}
                           </span>
+                          <span className="text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded-full text-[10px] uppercase font-bold">
+                            {task.type}
+                          </span>
                         </div>
-                        <div className="text-[11px] text-slate-500 mt-0.5">
-                          সময়: {task.durationSec} সেকেন্ড | সম্পন্ন: {task.completedCount} বার
+                        <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
+                          <span>সময়: <strong>{task.durationSec}s</strong></span>
+                          <span>• সম্পন্ন: <strong>{task.completedCount} বার</strong></span>
+                        </div>
+                        <div className="mt-1 flex items-center gap-1.5 text-[11px] font-mono text-slate-600 bg-white p-1.5 rounded-lg border border-slate-200/60 truncate">
+                          <Link className="w-3 h-3 text-amber-500 shrink-0" />
+                          <span className="truncate flex-1">{task.targetUrl || 'কোনো লিংক দেওয়া হয়নি'}</span>
+                          {task.targetUrl && task.targetUrl.startsWith('http') && (
+                            <a
+                              href={task.targetUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 text-[10px] font-bold shrink-0 flex items-center gap-0.5"
+                            >
+                              <span>ওপেন</span>
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          )}
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => deleteTask(task.id)}
-                        className="text-slate-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors"
-                        title="Delete task"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-1.5 shrink-0 self-end md:self-center">
+                        <button
+                          onClick={() => setEditingTask({ ...task })}
+                          className="bg-blue-50 text-blue-700 hover:bg-blue-100 px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1 transition-colors"
+                          title="টাস্ক ও লিংক এডিট করুন"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                          <span>এডিট</span>
+                        </button>
+                        <button
+                          onClick={() => deleteTask(task.id)}
+                          className="text-slate-400 hover:text-red-600 p-1.5 rounded-xl hover:bg-red-50 transition-colors"
+                          title="টাস্ক মুছে ফেলুন"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
+
+              {/* Task Edit Modal */}
+              {editingTask && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+                  <div className="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl relative border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
+                    <button
+                      onClick={() => setEditingTask(null)}
+                      className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1 rounded-full"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+
+                    <h3 className="font-extrabold text-slate-900 text-base mb-3 flex items-center gap-2">
+                      <Edit3 className="w-4 h-4 text-blue-600" />
+                      <span>টাস্ক ও ভিডিও লিংক এডিট করুন</span>
+                    </h3>
+
+                    <div className="space-y-3 text-xs">
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">টাস্কের নাম</label>
+                        <input
+                          type="text"
+                          value={editingTask.title}
+                          onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">টাস্কের বিবরণ</label>
+                        <textarea
+                          rows={2}
+                          value={editingTask.description}
+                          onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block font-bold text-slate-700 mb-1">রিওয়ার্ড (টাকা ৳)</label>
+                          <input
+                            type="number"
+                            step="any"
+                            value={editingTask.reward}
+                            onChange={(e) => setEditingTask({ ...editingTask, reward: parseFloat(e.target.value) || 0 })}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-slate-700 mb-1">সময় (সেকেন্ড)</label>
+                          <input
+                            type="number"
+                            value={editingTask.durationSec}
+                            onChange={(e) => setEditingTask({ ...editingTask, durationSec: parseInt(e.target.value) || 15 })}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">ক্যাটাগরি</label>
+                        <select
+                          value={editingTask.type}
+                          onChange={(e) => setEditingTask({ ...editingTask, type: e.target.value as any })}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium"
+                        >
+                          <option value="youtube">YouTube Video</option>
+                          <option value="telegram">Telegram / Social</option>
+                          <option value="web">Web Visit</option>
+                          <option value="review">App Review</option>
+                          <option value="ads">Ad Video</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">
+                          টার্গেট লিংক (URL বা YouTube ভিডিও লিংক)
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={editingTask.targetUrl}
+                            onChange={(e) => setEditingTask({ ...editingTask, targetUrl: e.target.value })}
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono text-xs"
+                          />
+                          {editingTask.targetUrl && editingTask.targetUrl.startsWith('http') && (
+                            <a
+                              href={editingTask.targetUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl flex items-center gap-1 font-bold text-xs shrink-0"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              <span>টেস্ট</span>
+                            </a>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-amber-700 mt-1 block">
+                          💡 ভিডিও পপ-আপে চালানোর জন্য ইউটিউব ভিডিওর সম্পূর্ণ লিংক দিন।
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2">
+                        <button
+                          onClick={() => {
+                            updateTask(editingTask);
+                            setEditingTask(null);
+                          }}
+                          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 px-4 rounded-xl flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                        >
+                          <Save className="w-4 h-4" />
+                          <span>পরিবর্তন সেভ করুন</span>
+                        </button>
+                        <button
+                          onClick={() => setEditingTask(null)}
+                          className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl"
+                        >
+                          বাতিল
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -1545,6 +1731,35 @@ export const AdminDashboard: React.FC = () => {
                       required
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    কাজ শিখুন (ভিডিও টিউটোরিয়াল) YouTube লিঙ্ক
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={editVideoTutorialUrl}
+                      onChange={(e) => setEditVideoTutorialUrl(e.target.value)}
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono text-xs"
+                    />
+                    {editVideoTutorialUrl && editVideoTutorialUrl.startsWith('http') && (
+                      <a
+                        href={editVideoTutorialUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl flex items-center gap-1 font-bold shrink-0 text-xs"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>টেস্ট</span>
+                      </a>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-slate-400 mt-0.5 block">
+                    ইউজার যখন হোমপেজে "কাজ শিখুন (ভিডিও)" চাপবে তখন এই ভিডিওটি সরাসরি পপ-আপ আকারে প্লে হবে।
+                  </span>
                 </div>
 
                 <div>

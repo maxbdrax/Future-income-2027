@@ -17,6 +17,7 @@ import {
   Clock,
   Youtube
 } from 'lucide-react';
+import { parseVideoUrl } from '../utils/videoHelper.ts';
 
 export const Modals: React.FC = () => {
   const {
@@ -389,28 +390,78 @@ export const Modals: React.FC = () => {
         )}
 
         {/* 7. Video Tutorial Modal */}
-        {currentModal === 'video-tutorial' && (
-          <div className="text-center pt-2">
-            <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 mx-auto flex items-center justify-center mb-3">
-              <Youtube className="w-8 h-8 text-red-600" />
+        {currentModal === 'video-tutorial' && (() => {
+          const tutorialVideo = parseVideoUrl(settings.videoTutorialUrl || 'https://www.youtube.com/watch?v=fJ9rUzIMcZQ');
+          return (
+            <div className="text-center pt-1 space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-red-100 flex items-center justify-center">
+                    <Youtube className="w-5 h-5 text-red-600" />
+                  </div>
+                  <h3 className="font-extrabold text-slate-900 text-sm md:text-base text-left">
+                    কাজ শিখুন ও টাকা আয় করুন (ভিডিও টিউটোরিয়াল)
+                  </h3>
+                </div>
+              </div>
+
+              {/* Embedded Video Player */}
+              <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-md border border-slate-800">
+                {tutorialVideo.type === 'youtube' && tutorialVideo.embedUrl ? (
+                  <iframe
+                    src={tutorialVideo.embedUrl}
+                    title="Tutorial Video"
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                ) : tutorialVideo.type === 'direct' && tutorialVideo.embedUrl ? (
+                  <video
+                    src={tutorialVideo.embedUrl}
+                    controls
+                    autoPlay
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-white/80 p-4">
+                    <Youtube className="w-10 h-10 text-red-500 mb-2" />
+                    <p className="text-xs font-semibold">ভিডিও লোড হচ্ছে...</p>
+                  </div>
+                )}
+              </div>
+
+              {/* External open button */}
+              {settings.videoTutorialUrl && settings.videoTutorialUrl !== '#' && (
+                <a
+                  href={settings.videoTutorialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 text-xs shadow-xs active:scale-95 transition-all"
+                >
+                  <Youtube className="w-4 h-4 fill-white" />
+                  <span>ইউটিউব অ্যাপ বা ব্রাউজারে ভিডিওটি দেখুন</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+
+              <p className="text-xs text-slate-600 text-left bg-amber-50 p-3 rounded-2xl border border-amber-200/80 leading-relaxed">
+                📌 <strong>কীভাবে কাজ করবেন:</strong><br/>
+                ১. Tasks অপশনে গিয়ে ভিডিও বা ওয়েব ভিজিট টাস্ক বেছে নিন। <br/>
+                ২. ভিডিও প্লে হলে বা লিংকে গেলে নির্ধারিত সেকেন্ড অপেক্ষা করুন। <br/>
+                ৩. কাউন্টডাউন শেষ হলে ক্লেইম বাটনে চাপ দিলে সরাসরি ব্যালেন্সে টাকা যোগ হবে! <br/>
+                ৪. ৬০০ টাকা হলেই বিকাশ বা নগদে তুলে নিন।
+              </p>
+
+              <button
+                onClick={closeModal}
+                className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-2xl text-xs active:scale-95 transition-all"
+              >
+                বুঝেছি, কাজ শুরু করি
+              </button>
             </div>
-            <h3 className="font-extrabold text-slate-900 text-base">
-              কীভাবে কাজ করে টাকা আয় করবেন?
-            </h3>
-            <p className="text-xs text-slate-600 mt-2 mb-4 leading-relaxed">
-              ১. প্রথমে Tasks অপশনে যান এবং উপলভ্য কাজটি সিলেক্ট করুন। <br/>
-              ২. নির্ধারিত সময় (১৫-৬০ সেকেন্ড) অপেক্ষা করে নির্দেশনা মেনে কাজটি সম্পূর্ণ করুন। <br/>
-              ৩. সাথে সাথে আপনার একাউন্টে টাকা যোগ হবে। <br/>
-              ৪. মিনিমাম ৬০০ টাকা হলেই সরাসরি বিকাশ বা নগদে উইথড্র করে পেমেন্ট নিন!
-            </p>
-            <button
-              onClick={closeModal}
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-2xl text-xs active:scale-95 transition-all"
-            >
-              বুঝেছি, কাজ শুরু করি
-            </button>
-          </div>
-        )}
+          );
+        })()}
 
         {/* 8. Notification list modal */}
         {currentModal === 'notifications' && (

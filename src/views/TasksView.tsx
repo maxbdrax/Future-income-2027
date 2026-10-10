@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext.tsx';
 import { Header } from '../components/Header.tsx';
 import { GoogleAdBanner } from '../components/GoogleAdBanner.tsx';
 import { TaskItem } from '../types/index.ts';
+import { parseVideoUrl } from '../utils/videoHelper.ts';
 import confetti from 'canvas-confetti';
 import {
   Youtube,
@@ -14,16 +15,22 @@ import {
   Clock,
   ExternalLink,
   X,
-  Sparkles
+  Sparkles,
+  CheckCircle2,
+  PlayCircle,
+  Eye,
+  Check
 } from 'lucide-react';
 
 export const TasksView: React.FC = () => {
-  const { tasks, completeTask, claimDailyBonus, currentUser, settings, showToast } = useApp();
+  const { tasks, completeTask, claimDailyBonus, currentUser, settings } = useApp();
   const [filter, setFilter] = useState<'all' | 'youtube' | 'social' | 'web'>('all');
   const [activeTaskModal, setActiveTaskModal] = useState<TaskItem | null>(null);
   const [countdown, setCountdown] = useState<number>(0);
+  const [totalDuration, setTotalDuration] = useState<number>(15);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const [isTaskDone, setIsTaskDone] = useState<boolean>(false);
+  const [targetVisited, setTargetVisited] = useState<boolean>(false);
 
   // Filter tasks
   const filteredTasks = tasks.filter((t) => {
@@ -52,11 +59,16 @@ export const TasksView: React.FC = () => {
 
   const handleStartTask = (task: TaskItem) => {
     setActiveTaskModal(task);
-    // Use demo duration of 10s if durationSec > 10 for friendly testing, or real duration
-    const demoSec = Math.min(task.durationSec, 15);
-    setCountdown(demoSec);
+    const duration = Math.max(10, task.durationSec || 15);
+    setTotalDuration(duration);
+    setCountdown(duration);
     setIsTimerRunning(true);
     setIsTaskDone(false);
+    setTargetVisited(false);
+  };
+
+  useEffect(() => {
+    if (!isTimerRunning) return;
 
     const interval = setInterval(() => {
       setCountdown((prev) => {
@@ -69,18 +81,28 @@ export const TasksView: React.FC = () => {
         return prev - 1;
       });
     }, 1000);
-  };
+
+    return () => clearInterval(interval);
+  }, [isTimerRunning]);
 
   const handleClaimReward = () => {
     if (!activeTaskModal) return;
     const res = completeTask(activeTaskModal.id);
     if (res.success) {
       confetti({
-        particleCount: 70,
-        spread: 60,
-        origin: { y: 0.7 }
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
       });
       setActiveTaskModal(null);
+    }
+  };
+
+  // Open target URL in a new tab/window and note visited
+  const handleOpenTargetLink = (url: string) => {
+    setTargetVisited(true);
+    if (url && url !== '#' && url !== '/') {
+      window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -107,6 +129,9 @@ export const TasksView: React.FC = () => {
       });
     }
   };
+
+  const parsedVideo = activeTaskModal ? parseVideoUrl(activeTaskModal.targetUrl) : null;
+  const progressPercent = totalDuration > 0 ? Math.min(100, Math.round(((totalDuration - countdown) / totalDuration) * 100)) : 100;
 
   return (
     <div className="min-h-screen pb-32">
@@ -214,7 +239,7 @@ export const TasksView: React.FC = () => {
                     {task.description}
                   </p>
 
-                  <div className="flex items-center gap-3 mt-2 text-xs font-bold">
+                  <div className="flex items-center gap-3 mt-2 text-xs font-bold flex-wrap">
                     <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
                       + ৳ {task.reward.toFixed(2)}
                     </span>
@@ -222,7 +247,7 @@ export const TasksView: React.FC = () => {
                       <Clock className="w-3.5 h-3.5" />
                       {task.durationSec} সেকেন্ড
                     </span>
-                    <span className="text-slate-400 font-normal">
+                    <span className="text-slate-400 font-normal text-[11px]">
                       • {task.completedCount} সম্পন্ন
                     </span>
                   </div>
@@ -232,86 +257,193 @@ export const TasksView: React.FC = () => {
               {/* Action Button */}
               <button
                 onClick={() => handleStartTask(task)}
-                className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-extrabold py-2.5 px-4 rounded-xl shadow-xs flex items-center justify-center gap-2 text-xs uppercase tracking-wider active:scale-98 transition-all"
+                className="w-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-700 hover:to-rose-700 text-white font-extrabold py-2.5 px-4 rounded-xl shadow-xs flex items-center justify-center gap-2 text-xs uppercase tracking-wider active:scale-98 transition-all"
               >
-                <span>কাজ শুরু করুন</span>
-                <ExternalLink className="w-3.5 h-3.5" />
+                {task.type === 'youtube' || task.type === 'ads' ? (
+                  <>
+                    <PlayCircle className="w-4 h-4 fill-white text-rose-600" />
+                    <span>ভিডিও চালু ও কাজ শুরু করুন</span>
+                  </>
+                ) : (
+                  <>
+                    <span>কাজ শুরু করুন</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </>
+                )}
               </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Task Completion Modal */}
+      {/* Task Completion & Video Player Modal */}
       {activeTaskModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl relative border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-4 sm:p-5 shadow-2xl relative border border-slate-100 my-auto animate-in fade-in zoom-in-95 duration-200 max-h-[95vh] overflow-y-auto">
+            {/* Close Button */}
             <button
-              onClick={() => setActiveTaskModal(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1"
+              onClick={() => {
+                setActiveTaskModal(null);
+                setIsTimerRunning(false);
+              }}
+              className="absolute top-3.5 right-3.5 text-slate-400 hover:text-slate-700 p-1.5 rounded-full hover:bg-slate-100 transition-colors z-10"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="text-center pt-2">
-              <div className="w-14 h-14 rounded-2xl bg-amber-50 mx-auto flex items-center justify-center mb-3">
+            {/* Modal Header */}
+            <div className="flex items-center gap-3 pr-8 mb-3 pb-2 border-b border-slate-100">
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center shrink-0 border border-amber-200">
                 {getTaskIcon(activeTaskModal.iconType)}
               </div>
+              <div className="min-w-0">
+                <h3 className="font-extrabold text-slate-900 text-sm sm:text-base leading-tight truncate">
+                  {activeTaskModal.title}
+                </h3>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-[11px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                    রিওয়ার্ড: ৳ {activeTaskModal.reward.toFixed(2)}
+                  </span>
+                  <span className="text-[11px] text-slate-500 flex items-center gap-1 font-semibold">
+                    <Clock className="w-3 h-3" />
+                    {totalDuration} সেকেন্ড
+                  </span>
+                </div>
+              </div>
+            </div>
 
-              <h3 className="font-extrabold text-slate-900 text-base">
-                {activeTaskModal.title}
-              </h3>
-              <p className="text-xs text-slate-600 mt-1">
-                {activeTaskModal.description}
-              </p>
+            {/* VIDEO PLAYER SECTION (Plays automatically in popup) */}
+            {parsedVideo && parsedVideo.isPlayableVideo ? (
+              <div className="space-y-2.5 mb-3">
+                <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-md border border-slate-800">
+                  {parsedVideo.type === 'youtube' && parsedVideo.embedUrl ? (
+                    <iframe
+                      src={parsedVideo.embedUrl}
+                      title={activeTaskModal.title}
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  ) : parsedVideo.type === 'direct' && parsedVideo.embedUrl ? (
+                    <video
+                      src={parsedVideo.embedUrl}
+                      controls
+                      autoPlay
+                      playsInline
+                      className="w-full h-full object-cover"
+                    />
+                  ) : null}
+                </div>
 
-              {/* Countdown circle */}
-              <div className="my-4 flex flex-col items-center justify-center">
-                <div className="w-20 h-20 rounded-full border-4 border-amber-400 bg-amber-50 flex flex-col items-center justify-center shadow-inner">
-                  {isTimerRunning ? (
-                    <>
-                      <span className="text-2xl font-black text-amber-700 font-mono">
-                        {countdown}
-                      </span>
-                      <span className="text-[9px] text-amber-800 font-bold uppercase">
-                        সেকেন্ড বাকি
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-sm font-black text-emerald-600">
-                      সম্পন্ন!
+                {/* Direct Action Link button */}
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button
+                    onClick={() => handleOpenTargetLink(activeTaskModal.targetUrl)}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-extrabold py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 text-xs shadow-xs active:scale-95 transition-all"
+                  >
+                    <Youtube className="w-4 h-4 fill-white" />
+                    <span>ইউটিউব অ্যাপ বা নতুন ট্যাবে ভিডিওটি দেখুন</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* TARGET URL / NON-VIDEO LINK SECTION */
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-3.5 mb-3 text-left space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <Globe className="w-4 h-4 text-emerald-600" />
+                    টার্গেট ওয়েবসাইট / লিংক:
+                  </span>
+                  {targetVisited && (
+                    <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <Check className="w-3 h-3" /> ভিজিট করা হয়েছে
                     </span>
                   )}
                 </div>
-                <p className="text-[11px] text-slate-500 mt-2 font-medium">
-                  {isTimerRunning ? 'বিজ্ঞাপন দেখা শেষ হওয়া পর্যন্ত অপেক্ষা করুন...' : 'টাস্ক সফলভাবে শেষ হয়েছে! রিওয়ার্ড নিন।'}
+
+                <div className="bg-white p-2 rounded-xl border border-amber-200/80 font-mono text-xs text-slate-700 truncate select-all">
+                  {activeTaskModal.targetUrl}
+                </div>
+
+                <button
+                  onClick={() => handleOpenTargetLink(activeTaskModal.targetUrl)}
+                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs shadow-sm active:scale-95 transition-all"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>👉 টার্গেট লিংকে প্রবেশ করুন (ভিজিট করুন)</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+
+                <p className="text-[11px] text-slate-500 leading-tight">
+                  💡 লিংকে প্রবেশ করে নির্ধারিত সময় শেষ হওয়া পর্যন্ত অপেক্ষা করুন। সময় শেষে রিওয়ার্ড যোগ হবে।
                 </p>
               </div>
+            )}
 
-              {/* Google AdSense Task Rewarded/Interstitial Ad */}
-              {settings.adsEnabled && (
-                <div className="mb-4 text-left">
-                  <GoogleAdBanner slotType="reward" />
-                </div>
-              )}
+            {/* LIVE COUNTDOWN & PROGRESS BAR */}
+            <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-3 mb-3">
+              <div className="flex items-center justify-between text-xs mb-1.5">
+                <span className="font-extrabold text-slate-800 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-amber-500" />
+                  {isTimerRunning ? 'অপেক্ষার সময়:' : 'স্ট্যাটাস:'}
+                </span>
+                {isTimerRunning ? (
+                  <span className="font-mono font-black text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-md text-sm animate-pulse">
+                    {countdown} সেকেন্ড বাকি
+                  </span>
+                ) : (
+                  <span className="font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-md text-xs flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    সময় সমাপ্ত!
+                  </span>
+                )}
+              </div>
 
-              {/* Reward Button */}
-              {isTaskDone ? (
-                <button
-                  onClick={handleClaimReward}
-                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold py-3.5 px-4 rounded-2xl shadow-lg shadow-emerald-900/20 active:scale-95 transition-all text-sm"
-                >
-                  ৳ {activeTaskModal.reward.toFixed(2)} টাকা জমা করুন
-                </button>
-              ) : (
-                <button
-                  disabled
-                  className="w-full bg-slate-200 text-slate-400 font-bold py-3.5 px-4 rounded-2xl text-sm cursor-not-allowed"
-                >
-                  টাইমার চলছে ({countdown}s)...
-                </button>
-              )}
+              {/* Progress track */}
+              <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-1000 ease-linear rounded-full ${
+                    isTaskDone
+                      ? 'bg-emerald-500'
+                      : 'bg-gradient-to-r from-amber-500 via-orange-500 to-red-500'
+                  }`}
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+
+              <div className="flex items-center justify-between text-[10px] text-slate-500 mt-1">
+                <span>{progressPercent}% সম্পূর্ণ</span>
+                <span>{isTimerRunning ? 'ভিডিও/লিংক চলমান...' : 'এখন টাকা জমা করুন'}</span>
+              </div>
             </div>
+
+            {/* GOOGLE ADSENSE SPONSOR BANNER (Compact & clean, sits under video) */}
+            {settings.adsEnabled && (
+              <div className="mb-3 text-left">
+                <GoogleAdBanner slotType="banner" compact={true} />
+              </div>
+            )}
+
+            {/* CLAIM REWARD ACTION BUTTON */}
+            {isTaskDone ? (
+              <button
+                onClick={handleClaimReward}
+                className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-800 text-white font-extrabold py-3.5 px-4 rounded-2xl shadow-lg shadow-emerald-900/20 active:scale-95 transition-all text-sm flex items-center justify-center gap-2 animate-bounce"
+              >
+                <Sparkles className="w-4 h-4 text-amber-200" />
+                <span>৳ {activeTaskModal.reward.toFixed(2)} টাকা ব্যালেন্সে জমা করুন!</span>
+              </button>
+            ) : (
+              <button
+                disabled
+                className="w-full bg-slate-150 text-slate-400 font-bold py-3.5 px-4 rounded-2xl text-xs sm:text-sm cursor-not-allowed border border-slate-200 bg-slate-100 flex items-center justify-center gap-2"
+              >
+                <Clock className="w-4 h-4 animate-spin text-slate-400" />
+                <span>টাইমার চলছে ({countdown}s বাকি)... অপেক্ষা করুন</span>
+              </button>
+            )}
           </div>
         </div>
       )}
