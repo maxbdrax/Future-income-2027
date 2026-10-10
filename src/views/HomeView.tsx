@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext.tsx';
 import { Header } from '../components/Header.tsx';
+import { GoogleAdBanner } from '../components/GoogleAdBanner.tsx';
 import {
   Smartphone,
   Download,
@@ -158,27 +159,9 @@ export const HomeView: React.FC = () => {
           </div>
         </button>
 
-        {/* AdSense Unit on Home */}
-        {settings.adsEnabled && settings.adsensePubId && (
-          <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-2.5 text-center shadow-xs">
-            <div className="flex items-center justify-between text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1 px-1">
-              <span>Google Sponsored Ad</span>
-              <span className="bg-amber-200/60 text-amber-900 px-1.5 py-0.2 rounded text-[8px]">AD</span>
-            </div>
-            <div className="min-h-[50px] bg-white rounded-xl border border-dashed border-amber-300 flex items-center justify-center p-2 text-center text-xs">
-              <ins
-                className="adsbygoogle"
-                style={{ display: 'block', width: '100%' }}
-                data-ad-client={settings.adsensePubId}
-                data-ad-slot={settings.adsenseBannerSlot || '9876543210'}
-                data-ad-format="auto"
-                data-full-width-responsive="true"
-              />
-              <span className="text-[11px] font-bold text-slate-700">
-                ⭐ Google AdSense রেভিনিউ সক্রিয় (Pub: {settings.adsensePubId.slice(0, 10)}...)
-              </span>
-            </div>
-          </div>
+        {/* Google AdSense Banner on Home */}
+        {settings.adsEnabled && (
+          <GoogleAdBanner slotType="banner" className="my-1" />
         )}
 
         {/* 5. "আজকের জব শুরু করুন" Red Banner (Matches Screenshot 2) */}

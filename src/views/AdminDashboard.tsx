@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext.tsx';
 import { TaskItem, PaymentMethod, VIP_PLANS } from '../types/index.ts';
+import { GoogleAdBanner } from '../components/GoogleAdBanner.tsx';
 import confetti from 'canvas-confetti';
 import {
   ShieldAlert,
@@ -24,7 +25,8 @@ import {
   Crown,
   Flame,
   Radio,
-  Zap
+  Zap,
+  HelpCircle
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -54,11 +56,19 @@ export const AdminDashboard: React.FC = () => {
   const [activeAdminTab, setActiveAdminTab] = useState<'overview' | 'deposits' | 'withdraws' | 'tasks' | 'users' | 'numbers' | 'adsense' | 'vip' | 'settings'>('overview');
 
   // AdSense Settings form states
-  const [editAdsensePub, setEditAdsensePub] = useState(settings.adsensePubId || 'ca-pub-1234567890123456');
+  const [editAdsensePub, setEditAdsensePub] = useState(settings.adsensePubId || 'ca-pub-3335603276700829');
   const [editAdsenseBannerSlot, setEditAdsenseBannerSlot] = useState(settings.adsenseBannerSlot || '9876543210');
   const [editAdsenseRewardSlot, setEditAdsenseRewardSlot] = useState(settings.adsenseRewardSlot || '1234567890');
   const [editAdsEnabled, setEditAdsEnabled] = useState(settings.adsEnabled ?? true);
   const [editCustomAdCode, setEditCustomAdCode] = useState(settings.customAdCode || '');
+
+  useEffect(() => {
+    if (settings.adsensePubId) setEditAdsensePub(settings.adsensePubId);
+    if (settings.adsenseBannerSlot) setEditAdsenseBannerSlot(settings.adsenseBannerSlot);
+    if (settings.adsenseRewardSlot) setEditAdsenseRewardSlot(settings.adsenseRewardSlot);
+    if (settings.adsEnabled !== undefined) setEditAdsEnabled(settings.adsEnabled);
+    if (settings.customAdCode !== undefined) setEditCustomAdCode(settings.customAdCode);
+  }, [settings]);
 
   // VIP assignment manual modal/state
   const [selectedUserForVip, setSelectedUserForVip] = useState<string | null>(null);
@@ -1063,12 +1073,49 @@ export const AdminDashboard: React.FC = () => {
                       অ্যাডসেন্স কোড স্টেটাস
                     </label>
                     <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-[11px] text-emerald-700 flex items-center justify-between">
-                      <span>✓ Auto Ads & Tag Ready</span>
-                      <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-sans font-bold">ইনটিগ্রেটেড</span>
+                      <span>✓ Firebase Live & Tag Ready</span>
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-sans font-bold">লাইভ সিঙ্ক</span>
                     </div>
                     <span className="text-[10px] text-slate-400 mt-0.5 block">
-                      cPanel প্যাকেজের config.php ও tasks.php-তে স্বয়ংক্রিয়ভাবে কার্যকর থাকবে
+                      Firebase ডাটাবেসে সেভ হবে এবং সব ডিভাইসে সাথে সাথে কার্যকর হবে
                     </span>
+                  </div>
+                </div>
+
+                {/* Step-by-Step AdSense Guide Box */}
+                <div className="bg-slate-900 text-slate-100 rounded-2xl p-4 space-y-3 border border-slate-800">
+                  <div className="flex items-center gap-2 text-amber-400 font-extrabold text-xs">
+                    <HelpCircle className="w-4 h-4" />
+                    <span>গুগল এডসেন্স থেকে Publisher ID ও Slot ID খুঁজে পাওয়ার নির্দেশিকা:</span>
+                  </div>
+
+                  <div className="space-y-2 text-[11px] text-slate-300 leading-relaxed font-sans">
+                    <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700/60">
+                      <p className="font-bold text-amber-300">১. Publisher ID (ca-pub-XXXXXXXXXXXXXXXX) কোথায় পাবেন?</p>
+                      <p className="text-slate-300 mt-0.5">
+                        • আপনার Google AdSense একাউন্টে লগইন করুন (adsense.google.com)<br/>
+                        • বাম পাশের মেনু থেকে <strong>Account</strong> ➔ <strong>Settings</strong> ➔ <strong>Account information</strong> এ যান<br/>
+                        • সেখানে <strong>Publisher ID</strong> দেখতে পাবেন, যা দেখতে এমন: <code className="text-emerald-400 font-mono bg-black/40 px-1.5 py-0.5 rounded">pub-1234567890123456</code><br/>
+                        • বক্সে লেখার সময় আগে <code className="text-emerald-400 font-mono bg-black/40 px-1 py-0.5 rounded">ca-</code> সহ লিখবেন (যেমন: <code className="text-emerald-400 font-mono bg-black/40 px-1.5 py-0.5 rounded">ca-pub-1234567890123456</code>)।
+                      </p>
+                    </div>
+
+                    <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700/60">
+                      <p className="font-bold text-cyan-300">২. Banner ও Rewarded Ad Slot ID (স্লট নাম্বার) কোথায় পাবেন?</p>
+                      <p className="text-slate-300 mt-0.5">
+                        • এডসেন্স মেনু থেকে <strong>Ads</strong> ➔ <strong>By ad unit</strong> এ ক্লিক করুন<br/>
+                        • নতুন অ্যাড ইউনিট তৈরি করতে <strong>Display ads</strong> অথবা <strong>In-feed ads</strong> সিলেক্ট করে নাম দিন এবং <strong>Create</strong> চাপুন<br/>
+                        • অ্যাড তৈরি হলে একটি কোড দেখাবে। সেই কোডের ভিতরে <code className="text-cyan-400 font-mono bg-black/40 px-1.5 py-0.5 rounded">data-ad-slot="9876543210"</code> লেখা দেখতে পাবেন<br/>
+                        • ঐ উদ্ধৃতি চিহ্নের ভেতরের ১০ বা ১১ সংখ্যার নাম্বারটিই হলো আপনার <strong>Ad Slot ID</strong>!
+                      </p>
+                    </div>
+
+                    <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700/60">
+                      <p className="font-bold text-purple-300">৩. কাস্টম অ্যাড কোড (Adsterra, Monetag বা Direct Link):</p>
+                      <p className="text-slate-300 mt-0.5">
+                        • গুগল এডসেন্স এপ্রুভ না থাকলে আপনি <strong className="text-white">Adsterra</strong> বা <strong className="text-white">Monetag</strong> থেকে ব্যানার বা পপ আন্ডার ট্যাগ কোড এনে নিচের কাস্টম কোড বক্সে সরাসরি বসাতে পারেন।
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -1088,14 +1135,44 @@ export const AdminDashboard: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3 pt-2">
+                <div className="flex flex-wrap items-center gap-3 pt-2">
                   <button
                     type="submit"
                     className="bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 font-black py-2.5 px-5 rounded-xl flex items-center gap-2 shadow-sm transition-all text-xs cursor-pointer"
                   >
                     <Save className="w-4 h-4" />
-                    <span>এডসেন্স সেটিংস সেভ করুন</span>
+                    <span>এডসেন্স সেটিংস সেভ করুন (Save to Firebase)</span>
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditAdsensePub('ca-pub-3335603276700829');
+                      setEditCustomAdCode('<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3335603276700829" crossorigin="anonymous"></script>');
+                      showToast('আপনার Google AdSense আইডি সেট করা হয়েছে!');
+                    }}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-4 rounded-xl flex items-center gap-1.5 transition-all text-xs cursor-pointer border border-slate-300"
+                  >
+                    <span>ডিফল্ট আইডি ca-pub-3335603276700829 বসান</span>
+                  </button>
+                </div>
+
+                {/* Live AdSense Unit Previews */}
+                <div className="pt-4 border-t border-slate-200 space-y-3">
+                  <h4 className="font-extrabold text-slate-800 text-xs flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>লাইভ বিজ্ঞাপন প্রিভিউ (Live Preview)</span>
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-500 mb-1">ব্যানার অ্যাড (Display Banner):</p>
+                      <GoogleAdBanner slotType="banner" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-500 mb-1">টাস্ক রিওয়ার্ডেড অ্যাড (Rewarded Unit):</p>
+                      <GoogleAdBanner slotType="reward" />
+                    </div>
+                  </div>
                 </div>
               </form>
             </div>

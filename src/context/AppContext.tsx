@@ -169,11 +169,11 @@ const DEFAULT_SETTINGS: AdminSettings = {
   videoTutorialUrl: 'https://youtube.com',
   apkDownloadUrl: '#',
   // Google AdSense & Ad Networks
-  adsensePubId: 'ca-pub-1234567890123456',
+  adsensePubId: 'ca-pub-3335603276700829',
   adsenseBannerSlot: '9876543210',
   adsenseRewardSlot: '1234567890',
   adsEnabled: true,
-  customAdCode: '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1234567890123456" crossorigin="anonymous"></script>'
+  customAdCode: '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3335603276700829" crossorigin="anonymous"></script>'
 };
 
 const DEFAULT_NOTIFICATIONS: LiveWithdrawNotification[] = [
@@ -286,6 +286,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       unsubSettings = onSnapshot(settingsDocRef, (snap) => {
         if (snap.exists()) {
           const remoteSettings = snap.data() as AdminSettings;
+          // Auto upgrade old placeholder ID to user's real publisher ID
+          if (remoteSettings.adsensePubId === 'ca-pub-1234567890123456' || !remoteSettings.adsensePubId) {
+            remoteSettings.adsensePubId = 'ca-pub-3335603276700829';
+            remoteSettings.customAdCode = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3335603276700829" crossorigin="anonymous"></script>';
+            setDoc(settingsDocRef, remoteSettings, { merge: true }).catch(err => {
+              handleFirestoreError(err, OperationType.WRITE, 'settings/global');
+            });
+          }
           setSettings(prev => ({ ...prev, ...remoteSettings }));
         } else {
           // Initialize in Firestore

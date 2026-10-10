@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext.tsx';
 import { VIP_PLANS, VipPlan } from '../types/index.ts';
+import { GoogleAdBanner } from '../components/GoogleAdBanner.tsx';
 import confetti from 'canvas-confetti';
 import {
   Crown,
@@ -295,6 +296,9 @@ export const VipLevelsView: React.FC = () => {
             );
           })}
         </div>
+
+        {/* Google AdSense Banner on VIP page */}
+        <GoogleAdBanner slotType="banner" className="my-1" />
 
         {/* Security / Guarantee Badge */}
         <div className="bg-white rounded-3xl p-4 border border-slate-200 text-center space-y-2 shadow-xs">
